@@ -142,3 +142,9 @@ AI / ML Engineer | Deep Learning |
 
 💙 SAFE‑MIND AI is built to support survivors with empathy, ethics, and responsible AI design.
 
+<img width="1920" height="1140" alt="image" src="https://github.com/user-attachments/assets/b8be1bf6-f6c0-4280-a31e-5c0ae3acbb75" />
+
+<img width="1920" height="1140" alt="Screenshot 2026-02-04 180559" src="https://github.com/user-attachments/assets/9e4f87f8-2b2f-45db-ae70-7f4ae4eb187b" />
+
+
+
