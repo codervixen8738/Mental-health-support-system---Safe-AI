@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Risk Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mental Health Risk Predictor</h2>
+    <input type="number" id="age" placeholder="Enter Age" min="1" required>
+    <input type="number" id="imc" placeholder="Enter IMC (BMI)" step="0.1" required>
+    <br>
+    <button onclick="predictRisk()">Predict Risk</button>
+    <div class="result" id="result"></div>
+</div>
+
+    <div class="container" style="margin-top: 20px;">
+        <h2>Support Chat</h2>
+        <input type="text" id="chatInput" placeholder="Type your message here..." required>
+        <br>
+        <button onclick="sendChat()">Send</button>
+        <div class="result" id="chatResult"></div>
+    </div>
+        resultDiv.textContent = "Please enter both Age and IMC.";
+        return;
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ Age: Number(age), IMC: Number(imc) })
+        });
+
+        if (!response.ok) {
+            throw new Error("Server error or invalid response");
+        }
+
+        const data = await response.json();
+        // Example: { "mental_health_risk": "Moderate", "risk_score": 0.63 }
+        resultDiv.innerHTML = `
+            Risk Level: <strong>${data.mental_health_risk}</strong><br>
+            Risk Score: <strong>${data.risk_score}</strong>
+        `;
+    } catch (error) {
+        console.error(error);
+        resultDiv.textContent = "Error connecting to API. Make sure your server is running.";
+    }
+}
+
+async function sendChat() {
+    const message = document.getElementById("chatInput").value;
+    const chatResultDiv = document.getElementById("chatResult");
+
+    if (!message) {
+        chatResultDiv.textContent = "Please enter a message.";
+        return;
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: message })
+        });
+
+        if (!response.ok) {
+            throw new Error("Server error or invalid response");
+        }
+
+        const data = await response.json();
+        if (data.mode === "crisis") {
+            chatResultDiv.innerHTML = `
+                <strong>Crisis Mode:</strong> ${data.message}<br>
+                Emergency Contacts: ${JSON.stringify(data.quick_dial)}
+            `;
+        } else {
+            chatResultDiv.innerHTML = `
+                <strong>Support:</strong> ${data.message}<br>
+                Options: ${data.options.join(", ")}
+            `;
+        }
+    } catch (error) {
+        console.error(error);
+        chatResultDiv.textContent = "Error connecting to chat API.";
+    }
+}
+</script>
+
+</body>
+</html>

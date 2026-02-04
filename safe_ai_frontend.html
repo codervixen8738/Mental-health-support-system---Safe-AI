@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFE AI - Trauma Support System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        .message.user .message-avatar {
+            background: #007bff;
+            color: white;
+        }
+
+        .message.bot .message-avatar {
+            background: #28a745;
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #007bff;
+        }
+
+        .send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #0056b3;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .risk-assessment {
+            text-align: center;
+        }
+
+        .risk-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .risk-inputs input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .assess-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .assess-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .risk-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        .crisis-resources {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .crisis-resources h3 {
+            color: white;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .generate-report-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .generate-report-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 18px;
+            max-width: 70px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> SAFE AI</h1>
+            <p>Specialized AI for Sexual Assault & Trauma Recovery</p>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3><i class="fas fa-comments"></i> Chat with SAFE AI Assistant</h3>
+                    <p>This is a safe space. Share what feels comfortable...</p>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Hello, I'm SAFE AI. I'm here to provide trauma-informed support. You're in control of what you share, and everything is confidential. How are you feeling today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                        <button class="send-btn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card risk-assessment">
+                    <h3><i class="fas fa-chart-line"></i> Risk Assessment</h3>
+                    <div class="risk-inputs">
+                        <input type="number" id="ageInput" placeholder="Age" min="18" max="100" value="25">
+                        <input type="number" id="bmiInput" placeholder="BMI" min="15" max="50" step="0.1" value="22.5">
+                    </div>
+                    <button class="assess-btn" onclick="assessRisk()">
+                        <i class="fas fa-calculator"></i> Assess Risk
+                    </button>
+                    <div id="riskResult"></div>
+                </div>
+
+                <div class="card crisis-resources">
+                    <h3><i class="fas fa-phone"></i> Crisis Resources</h3>
+                    <div class="resource-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <strong>RAINN</strong><br>
+                            1-800-656-HOPE
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <i class="fas fa-sms"></i>
+                        <div>
+                            <strong>Crisis Text</strong><br>
+                            Text HOME to 741741
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Emergency</strong><br>
+                            Call 911
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <button class="generate-report-btn" onclick="generateReport()">
+                        <i class="fas fa-file-medical"></i> Generate Support Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>🛡️ SAFE AI - Specialized Support for Trauma Survivors</strong></p>
+            <p><em>This system provides trauma-informed support and is not a substitute for professional therapy.</em></p>
+            <p><strong>Remember:</strong> You are not alone. Healing is possible. You matter.</p>
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+
+            // Add user message to chat
+            addMessage('user', message);
+            input.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Send to SAFE AI backend
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                if (data.error) {
+                    addMessage('bot', 'I apologize, but I\'m having trouble processing your message right now. Please try again.');
+                } else {
+                    addMessage('bot', data.reply);
+                    
+                    // Show suggestions if available
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        const suggestions = 'Suggestions: ' + data.suggestions.join(', ');
+                        addMessage('bot', suggestions);
+                    }
+                    
+                    // Show resources if available
+                    if (data.resources && data.resources.length > 0) {
+                        const resources = 'Resources: ' + data.resources.join(', ');
+                        addMessage('bot', resources);
+                    }
+                }
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                addMessage('bot', 'I\'m having connection issues. Please ensure you\'re connected to the SAFE AI server.');
+                console.error('Error:', error);
+            });
+        }
+
+        function addMessage(sender, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = content;
+            
+            if (sender === 'user') {
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Store in conversation history
+            conversationHistory.push({sender, content, timestamp: new Date()});
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            const chatMessages = document.getElementById('chatMessages');
+            indicator.style.display = 'flex';
+            chatMessages.appendChild(indicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.style.display = 'none';
+        }
+
+        function generateAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Crisis detection
+            if (lowerMessage.includes('suicide') || lowerMessage.includes('kill myself') || lowerMessage.includes('hurt myself')) {
+                return "I'm very concerned about your safety right now. Please reach out for immediate help: Call 911 if in immediate danger, RAINN: 1-800-656-HOPE, or Crisis Text Line: Text HOME to 741741. You matter, and there are people who want to help you.";
+            }
+            
+            // Trauma disclosure
+            if (lowerMessage.includes('assault') || lowerMessage.includes('rape') || lowerMessage.includes('abuse')) {
+                return "Thank you for trusting me with something so difficult to share. What happened to you was not your fault. You showed incredible strength by surviving and reaching out. I'm here to support you in whatever way feels helpful right now.";
+            }
+            
+            // PTSD symptoms
+            if (lowerMessage.includes('flashback') || lowerMessage.includes('nightmare') || lowerMessage.includes('triggered')) {
+                return "What you're experiencing sounds like trauma responses, which are normal reactions to abnormal experiences. These symptoms can be very distressing, but they can improve with proper support and treatment. Have you been able to connect with a trauma-informed therapist?";
+            }
+            
+            // Safety concerns
+            if (lowerMessage.includes('unsafe') || lowerMessage.includes('scared') || lowerMessage.includes('afraid')) {
+                return "Your safety is my primary concern. Are you currently in a safe place? Do you feel safe right now? If you're in immediate danger, please call 911.";
+            }
+            
+            // General supportive responses
+            const supportiveResponses = [
+                "I hear you, and I want you to know that your feelings are valid. Trauma recovery takes time, and every step forward matters, no matter how small.",
+                "Thank you for sharing with me. You've shown incredible courage by reaching out. What would feel most supportive right now?",
+                "I'm here to listen and support you. Remember that healing isn't linear, and it's okay to take things at your own pace.",
+                "Your strength in surviving and seeking support is remarkable. What's been the most challenging part of your day?"
+            ];
+            
+            return supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
+        }
+
+        function assessRisk() {
+            const age = document.getElementById('ageInput').value;
+            const bmi = document.getElementById('bmiInput').value;
+            const resultDiv = document.getElementById('riskResult');
+            
+            if (!age || !bmi) {
+                resultDiv.innerHTML = '<div class="risk-result">Please enter both age and BMI</div>';
+                return;
+            }
+            
+            // Send to SAFE AI backend
+            fetch('/api/risk-assessment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ age: parseFloat(age), bmi: parseFloat(bmi) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.innerHTML = '<div class="risk-result">Risk assessment unavailable</div>';
+                } else {
+                    let riskClass;
+                    if (data.risk_level.includes('Low')) riskClass = 'risk-low';
+                    else if (data.risk_level.includes('Medium')) riskClass = 'risk-medium';
+                    else riskClass = 'risk-high';
+                    
+                    resultDiv.innerHTML = `
+                        <div class="risk-result ${riskClass}">
+                            ${data.risk_level}<br>
+                            <small>Confidence: ${(data.confidence * 100).toFixed(1)}%</small>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = '<div class="risk-result">Connection error</div>';
+                console.error('Error:', error);
+            });
+        }
+
+        function generateReport() {
+            // Send to SAFE AI backend
+            fetch('/api/generate-report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    alert('SAFE AI Support Report generated successfully!');
+                    // Trigger download
+                    window.open('/api/download-report', '_blank');
+                }
+            })
+            .catch(error => {
+                alert('Connection error. Please ensure the SAFE AI server is running.');
+                console.error('Error:', error);
+            });
+        }
+
+        // Initialize with welcome message
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on input
+            document.getElementById('messageInput').focus();
+        });
+    </script>
+</body>
+</html>
